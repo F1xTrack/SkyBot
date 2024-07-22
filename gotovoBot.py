@@ -3,7 +3,7 @@ from telebot import types
 import sqlite3
 
 # Замените 'YOUR_BOT_TOKEN' на токен вашего бота
-TOKEN = '6884763965:AAGaNLTZh0DlBJ3jVUiX9pv5RqwDmebGFbU'
+TOKEN = '6884763965:AAGaNLTZh0DlBJ3jVUiX9pv5RqwDmebGMbU'
 bot = telebot.TeleBot(TOKEN)
 
 # Подключаемся к базе данных
