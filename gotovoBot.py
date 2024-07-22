@@ -71,14 +71,14 @@ def ask_question(message):
     user_id = message.chat.id
     step = user_state[user_id]["step"]
     if step < len(questions):
-        bot.send_message(user_id, f"**{step + 1} вопрос:**\n{questions[step]}\n\nОтправьте одним сообщением без фото/стикеров/емодзи и т.п. ответ на этот вопрос", parse_mode='Markdown')
+        bot.send_message(user_id, "**{} вопрос:**\n{}\n\nОтправьте одним сообщением без фото/стикеров/емодзи и т.п. ответ на этот вопрос".format(step + 1, questions[step]), parse_mode='Markdown')
     else:
         show_summary(user_id)
 
 def show_summary(user_id):
     answers = user_state[user_id]["answers"]
-    summary = "\n".join([f"{i+1}. {answer}" for i, answer in enumerate(answers)])
-    bot.send_message(user_id, f"Поздравляю, вы ответили на все вопросы!\n\nВот ваши ответы:\n{summary}\n\nХотите отправить заявку на проверку, или хотите переписать её заново?", parse_mode='Markdown')
+    summary = "\n".join(["{}. {}".format(i + 1, answer) for i, answer in enumerate(answers)])
+    bot.send_message(user_id, "Поздравляю, вы ответили на все вопросы!\n\nВот ваши ответы:\n{}\n\nХотите отправить заявку на проверку, или хотите переписать её заново?".format(summary), parse_mode='Markdown')
     markup = types.InlineKeyboardMarkup()
     btn_submit = types.InlineKeyboardButton(text="Отправить!", callback_data="submit_application")
     btn_rewrite = types.InlineKeyboardButton(text="Переписать!", callback_data="start_application")
@@ -92,13 +92,13 @@ def check_subscription(user_id):
 def send_application_to_admin(user_id):
     answers = user_state[user_id]["answers"]
     username = user_state[user_id]["username"]
-    summary = "\n".join([f"{i+1}. {answer}" for i, answer in enumerate(answers)])
+    summary = "\n".join(["{}. {}".format(i + 1, answer) for i, answer in enumerate(answers)])
     admin_id = 5125745037  # Замените на ваш ID
     markup = types.InlineKeyboardMarkup()
-    btn_accept = types.InlineKeyboardButton(text="Принят", callback_data=f"accept_{user_id}")
-    btn_reject = types.InlineKeyboardButton(text="Отклонён", callback_data=f"reject_{user_id}")
+    btn_accept = types.InlineKeyboardButton(text="Принят", callback_data="accept_{}".format(user_id))
+    btn_reject = types.InlineKeyboardButton(text="Отклонён", callback_data="reject_{}".format(user_id))
     markup.add(btn_accept, btn_reject)
-    bot.send_message(admin_id, f"Новая заявка от @{username}\n\n{summary}", reply_markup=markup)
+    bot.send_message(admin_id, "Новая заявка от @{}\n\n{}".format(username, summary), reply_markup=markup)
 
 @bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id]["step"] < len(questions))
 def handle_answer(message):
@@ -106,7 +106,7 @@ def handle_answer(message):
     step = user_state[user_id]["step"]
     user_state[user_id]["answers"].append(message.text)
     username = user_state[user_id]["username"]
-    cursor.execute(f"UPDATE Users SET Question{step + 1} = ? WHERE User = ?", (message.text, username))
+    cursor.execute("UPDATE Users SET Question{} = ? WHERE User = ?".format(step + 1), (message.text, username))
     conn.commit()
     user_state[user_id]["step"] += 1
     ask_question(message)
@@ -125,8 +125,6 @@ def handle_admin_action(call):
 def get_rejection_reason(message, user_id):
     reason = message.text
     username = user_state[user_id]["username"]
-    bot.send_message(user_id, f"*Здравствуйте, к сожалению вы не приняты :(*\n\nПричина отклонения: {reason}", parse_mode='Markdown')
+    bot.send_message(user_id, "*Здравствуйте, к сожалению вы не приняты :(*\n\nПричина отклонения: {}".format(reason), parse_mode='Markdown')
     cursor.execute("UPDATE Users SET Verdict = ? WHERE User = ?", (reason, username))
     conn.commit()
-
-bot.polling(none_stop=True)
