@@ -2,15 +2,12 @@ import telebot
 from telebot import types
 import sqlite3
 
-# Замените 'YOUR_BOT_TOKEN' на токен вашего бота
 TOKEN = '6884763965:AAGaNLTZh0DlBJ3jVUiX9pv5RqwDmebGMbU'
 bot = telebot.TeleBot(TOKEN)
 
-# Подключаемся к базе данных
 conn = sqlite3.connect('users.db', check_same_thread=False)
 cursor = conn.cursor()
 
-# Вопросы
 questions = [
     "Ваш никнейм в Майнкрафте?",
     "Ваш возраст?",
@@ -26,10 +23,8 @@ questions = [
     "О себе:\nПожалуйста, расскажите немного о себе, ваших интересах, опыте игры в Майнкрафт и почему вы хотите присоединиться к нашему среверу?"
 ]
 
-# Словарь для хранения состояния пользователей
 user_state = {}
 
-# Хэндлер для команды /start
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.InlineKeyboardMarkup()
@@ -37,7 +32,6 @@ def start(message):
     markup.add(btn)
     bot.send_message(message.chat.id, "*Здравствуйте! Я - SkyBot!*\nЯ помогу тебе попасть на майнкрафт сервер SkyWorld! Нужно будет подать простую заявку на сервер. Нажимай на кнопку \"Подать заявку!\"", parse_mode='Markdown', reply_markup=markup)
 
-# Обработчик нажатий на инлайн-кнопки
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     if call.data == "start_application":
